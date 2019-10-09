@@ -1,0 +1,13 @@
+localhost ansible_connection=local
+
+[zabbix_server]
+ssfnzas911 ansible_host=10.211.55.101
+
+[zabbix_proxy]
+ssfnzas911 ansible_host=10.211.55.101
+
+[all:vars]
+# Settings for Zabbix API Access
+zabbix_apiurl="http://10.211.55.101:9595"
+zabbix_apiuser=Admin
+zabbix_apipw=zabbix
