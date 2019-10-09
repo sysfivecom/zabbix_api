@@ -1,0 +1,5 @@
+[gerrit]
+host=review.sysfive.com
+port=29418
+project=configuration/ssfn-ansible-modules/zabbix_api
+defaultbranch=master
