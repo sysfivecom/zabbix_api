@@ -1,0 +1,11 @@
+- hosts: ssfnzas911
+  gather_facts: no
+  tasks:
+    - name: Get Testlogin
+      local_action:
+        module: zabbix_testapi
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+      register: zbxout
+    - debug: var=zbxout

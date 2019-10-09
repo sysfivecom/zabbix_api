@@ -1,0 +1,15 @@
+- hosts: ssfnzas911
+  gather_facts: no
+  tasks:
+    - name: Get users via module
+      local_action:
+        module: zabbix_user
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        username: johndoe
+        name: "John"
+        surname: "Doe"
+        passwd: "supersecret"
+        usergroups:
+          - Group1

@@ -14,7 +14,7 @@ If it's needed to test in a "full cluster", please
 Adapt a new inventory as needed.
 
 ## Test the kit
-ansible -i vagrant_inventory testkit.yml
+```ansible-playbook -i vagrant_inventory testkit.yml```
 
 # Development
 Before creating new modules, please check back if the
