@@ -76,6 +76,80 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 
+class zbxUser(object):
+    def __init__(self, module, zbx):
+        self._module = module
+        self._zapi = zbx
+
+    def user_exists(self, alias, userdata):
+        method = "create"
+        exists = self._zapi.user.get({'filter': {'alias': alias}})
+        if len(exists) > 0 and 'userid' in exists[0]:
+          method = "update"
+          # lets check for all parameters - except passwd..
+          # XXX: expand this list to all API properties for UserObject
+          userparams = self._zapi.user.get({'filter': {'alias': alias,
+            'surname': userdata['surname'],
+            'name': userdata['name'],
+          }})
+          # XXX: need to check usergroups!
+          if len(userparams) > 0:
+            method = "exists"
+
+        return method
+
+    def check_usergroup_exists(self, group_names):
+        for group_name in group_names:
+            result = self._zapi.usergroup.get({'filter': {'usrgrpid': group_name}})
+            if not result:
+                self._module.fail_json(msg="Usergroup not found: '%s'" % group_name)
+        return True
+
+    def create_or_update(self, method, alias, data):
+        try:
+            if self._module.check_mode:
+                self._module.exit_json(changed=True)
+
+            # we could just use 'data', but this preparation
+            # to insert additional data from other lookups
+            parameters = {}
+            parameters['alias'] = alias
+            for item in data:
+                if data[item]:
+                   parameters[item] = data[item]
+                   if 'usrgrps' in parameters:
+                      groupids = []
+                      for group in parameters['usrgrps']:
+                         groupids.append({'usrgrpid': group})
+                      parameters['usrgrps'] = groupids
+
+            if len(parameters) > 1:
+                if method == "update":
+                   result = self._zapi.user.get({
+                     'filter': {'alias': alias} })
+                   parameters['userid'] = result[0]['userid']
+                   self._zapi.user.update(parameters)
+                   self._module.exit_json(
+                       changed=True,
+                       result="Updated user %s" % alias
+                   )
+                if method == "create":
+                   self._zapi.user.create(parameters)
+                   self._module.exit_json(
+                       changed=True,
+                       result="Created user %s" % alias
+                   )
+                else:
+                   self._module.fail_json(
+                       changed=False,
+                       msg="unknown method '%s' to create_or_update" % method
+                   )
+            else:
+                self._module.exit_json(changed=False, msg="No user data/parameters found!")
+        except Exception as e:
+            self._module.fail_json(msg="XX Failed to %s user %s: %s" %
+                                       (method, alias, e))
+
 
 def main():
     module = AnsibleModule(
@@ -126,7 +200,28 @@ def main():
     except Exception as e:
         module.fail_json(msg="Failed to connect to Zabbix server: {server} with {exception}".format(server=server_url, exception=e))
 
+    user = zbxUser(module, zbx)
 
-    module.exit_json(changed=True, result="This module should not exit this way!")
+    userdata = {}
+    # the key in brackets must match the API object properties
+    userdata['alias'] = username
+    userdata['name'] = name
+    userdata['surname'] = surname
+    userdata['passwd'] = passwd
+    userdata['usrgrps'] = usergroups
+
+    method = user.user_exists(username, userdata)
+    group_ids = user.check_usergroup_exists(usergroups)
+
+    if method == "exists":
+        if state == "absent":
+            user.delete(alias)
+        else:
+            module.exit_json(changed=False, result="User %s exists as specified" % username)
+    else:
+        user.create_or_update(method, username, userdata)
+
+    # fallthru error
+    module.fail_json(changed=True, result="This module should not exit this way!")
 if __name__ == '__main__':
     main()

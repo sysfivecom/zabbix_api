@@ -12,4 +12,5 @@
         surname: "Doe"
         passwd: "supersecret"
         usergroups:
-          - Group1
+          - 7
+          - 8
