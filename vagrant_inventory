@@ -7,7 +7,7 @@ ssfnzas911 ansible_host=10.211.55.101
 ssfnzas911 ansible_host=10.211.55.101
 
 [all:vars]
-ansible_python_interpreter=/usr/local/bin/python3
+ansible_python_interpreter=/usr/bin/env python3
 # Settings for Zabbix API Access
 zabbix_apiurl="http://10.211.55.101:9595"
 zabbix_apiuser=Admin

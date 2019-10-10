@@ -3,9 +3,14 @@ You can test/debug these modules by changing inventory files
 to point to an existing Zabbix API endpoint or create
 a playground as follows.
 
+## Dependencies
+This relies on python library zabbix-api, install by:
+```pip3 install zabbix-api```.
+
 ## Vagrant (small)
 A quick option is to create a VM with the cookbook in
-ssfn1_v_zabbixserver. See README.md there on how to this.
+ssfn1_v_zabbixserver. See README.md there on how to this
+(esp. setup_zabbix_db.sh).
 If unchanged, the existing inventory will "just work".
 
 ## Vagrant (large)
