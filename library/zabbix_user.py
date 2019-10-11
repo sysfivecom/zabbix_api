@@ -11,7 +11,7 @@ __metaclass__ = type
 
 ANSIBLE_METADATA = {'metadata_version': '1.0',
                     'status': ['preview'],
-                    'supported_by': 'sysfive'}
+                    'supported_by': 'community'}
 
 
 DOCUMENTATION = '''
@@ -32,6 +32,7 @@ requirements:
     - "python >= 2.6"
     - zabbix-api
 options:
+ #XXX: missing: user_medias, usergroups-by-name
     state:
         description:
             - Create or update or delete user
@@ -40,9 +41,68 @@ options:
         choices: [ "present", "absent" ]
     username:
         description:
-            - User to create or update or delete.
+            - Users login/accountname
         required: true
         aliases: [ "alias" ]
+    passwd:
+        description:
+            - Password for user's account (only 'create')
+        required: false
+    name:
+        description:
+            - First name of the user
+        required: false
+    surname:
+        description:
+            - Family name of the user
+        required: false
+    autologin:
+        description:
+            - en/disable autologin (1=enabled)
+        required: false
+        choices: [ 0, 1 ]
+        default: 0
+    autologout:
+        description:
+            - logout after idle time
+        required: false
+        default: "15m"
+    lang:
+        description:
+            - Language code for this user
+        required: false
+        default: "en_GB"
+    refresh:
+        description:
+            - automatic refresh of webpages
+        required: false
+        default: "30s"
+    rows:
+        description:
+            - object rows per webpage
+        required: false
+        default: 50
+        aliases: [ "rows_per_page" ]
+    theme:
+        description:
+            - webpage theme for this user
+        required: false
+        default: "default"
+        choices: [ "blue-theme", "dark-theme", "default" ]
+    type:
+        description:
+            - (privilege) type (0=user,1=admin,2=super admin)
+        required: false
+        default: 0
+        choices: [ 0, 1, 2 ]
+    url:
+        description:
+            - redirect to this URL after login
+        required: false
+    usergroups:
+        description:
+            - list of Usergroup IDs
+        required: false
 
 extends_documentation_fragment:
     - zabbix
@@ -63,7 +123,7 @@ EXAMPLES = '''
     surname: "Doe"
     passwd: "supersecret"
     usergroups:
-      - Group1
+      - 8
 '''
 
 try:
@@ -89,8 +149,16 @@ class zbxUser(object):
           # lets check for all parameters - except passwd..
           # XXX: expand this list to all API properties for UserObject
           userparams = self._zapi.user.get({'filter': {'alias': alias,
-            'surname': userdata['surname'],
+            'autologin': userdata['autologin'],
+            'autologout': userdata['autologout'],
+            'lang': userdata['lang'],
             'name': userdata['name'],
+            'refresh': userdata['refresh'],
+            'rows_per_page': userdata['rows'],
+            'surname': userdata['surname'],
+            'theme': userdata['theme'],
+            'type': userdata['type'],
+            'url': userdata['url'],
           }})
           # XXX: need to check usergroups!
           if len(userparams) > 0:
@@ -160,13 +228,21 @@ def main():
             http_login_user=dict(type='str', required=False, default=None),
             http_login_password=dict(type='str', required=False, default=None, no_log=True),
             validate_certs=dict(type='bool', required=False, default=True),
+            state=dict(default="present", choices=['present', 'absent']),
+            timeout=dict(type='int', default=10),
             username=dict(type='str', required=True, aliases=['alias']),
             name=dict(type='str', required=False),
             surname=dict(type='str', required=False),
             passwd=dict(type='str', required=True, aliases=['password'], no_log=True),
-            usergroups=dict(type='list', default=['Guests']),
-            state=dict(default="present", choices=['present', 'absent']),
-            timeout=dict(type='int', default=10)
+            autologin=dict(type='int', required=False),
+            autologout=dict(type='str', required=False),
+            lang=dict(type='str', required=False),
+            refresh=dict(type='str', required=False),
+            rows=dict(type='int', required=False, aliases=['rows_per_page']),
+            theme=dict(type='str', required=False),
+            type=dict(type='int', required=False),
+            url=dict(type='str', required=False),
+            usergroups=dict(type='list', default=[7]),
         ),
         supports_check_mode=False
     )
@@ -182,13 +258,21 @@ def main():
     http_login_user = module.params['http_login_user']
     http_login_password = module.params['http_login_password']
     validate_certs = module.params['validate_certs']
-    username = module.params['username']
-    passwd = module.params['passwd']
-    usergroups = module.params['usergroups']
-    name = module.params['name']
-    surname = module.params['surname']
     state = module.params['state']
     timeout = module.params['timeout']
+    username = module.params['username']
+    name = module.params['name']
+    surname = module.params['surname']
+    passwd = module.params['passwd']
+    autologin = module.params['autologin']
+    autologout = module.params['autologout']
+    lang = module.params['lang']
+    refresh = module.params['refresh']
+    rows = module.params['rows']
+    theme = module.params['theme']
+    type = module.params['type']
+    url = module.params['url']
+    usergroups = module.params['usergroups']
 
     zbx = None
 
@@ -208,6 +292,14 @@ def main():
     userdata['name'] = name
     userdata['surname'] = surname
     userdata['passwd'] = passwd
+    userdata['autologin'] = autologin
+    userdata['autologout'] = autologout
+    userdata['lang'] = lang
+    userdata['refresh'] = refresh
+    userdata['rows'] = rows
+    userdata['theme'] = theme
+    userdata['type'] = type
+    userdata['url'] = url
     userdata['usrgrps'] = usergroups
 
     method = user.user_exists(username, userdata)
