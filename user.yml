@@ -12,5 +12,13 @@
         surname: "Doe"
         passwd: "supersecret"
         usergroups:
-          - 7
-          - 8
+          - usrgrpid: "7"
+          - usrgrpid: "8"
+        media:
+          - mediatypeid: "1"
+            sendto: "foo@example.com"
+            severity: 24
+            period: "1-7,00:00-24:00"
+          - mediatypeid: "1"
+            sendto: "alal@example.com"
+            severity: 63

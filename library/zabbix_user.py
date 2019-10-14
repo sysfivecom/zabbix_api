@@ -103,7 +103,10 @@ options:
         description:
             - list of Usergroup IDs
         required: false
-
+    media:
+        description:
+            - list of trigger media definitions
+        required: false
 extends_documentation_fragment:
     - zabbix
 
@@ -123,7 +126,24 @@ EXAMPLES = '''
     surname: "Doe"
     passwd: "supersecret"
     usergroups:
-      - 8
+      - usrgrpid: "8"
+# add/change media settings
+- name: Create User
+  local_action:
+    module: zabbix_user
+    server_url: http://monitor.example.com
+    login_user: api_user
+    login_password: api_user_pass
+    state: present
+    username: johndoe
+    media:
+      - mediatypeid: "1"
+        sendto: "foo@example.com"
+        severity: 24
+        period: "1-7,00:00-24:00"
+      - mediatypeid: "1"
+        sendto: "all@example.com"
+        severity: 63
 '''
 
 try:
@@ -159,6 +179,7 @@ class zbxUser(object):
             'theme': userdata['theme'],
             'type': userdata['type'],
             'url': userdata['url'],
+            'user_medias': userdata['user_medias'],
           }})
           # XXX: need to check usergroups!
           if len(userparams) > 0:
@@ -167,8 +188,9 @@ class zbxUser(object):
         return method
 
     def check_usergroup_exists(self, group_names):
+      #XXX: need to loop over value or lookup_byname
         for group_name in group_names:
-            result = self._zapi.usergroup.get({'filter': {'usrgrpid': group_name}})
+            result = self._zapi.usergroup.get({'filter': {group_name}})
             if not result:
                 self._module.fail_json(msg="Usergroup not found: '%s'" % group_name)
         return True
@@ -185,11 +207,11 @@ class zbxUser(object):
             for item in data:
                 if data[item]:
                    parameters[item] = data[item]
-                   if 'usrgrps' in parameters:
-                      groupids = []
-                      for group in parameters['usrgrps']:
-                         groupids.append({'usrgrpid': group})
-                      parameters['usrgrps'] = groupids
+                   if 'media' in parameters:
+                      medias = []
+                      for media in parameters['media']:
+                         medias.append({'user_medias': media})
+                      parameters['user_medias'] = medias
 
             if len(parameters) > 1:
                 if method == "update":
@@ -243,6 +265,7 @@ def main():
             type=dict(type='int', required=False),
             url=dict(type='str', required=False),
             usergroups=dict(type='list', default=[7]),
+            media=dict(type='list', required=False),
         ),
         supports_check_mode=False
     )
@@ -273,6 +296,7 @@ def main():
     type = module.params['type']
     url = module.params['url']
     usergroups = module.params['usergroups']
+    media = module.params['media']
 
     zbx = None
 
@@ -301,9 +325,10 @@ def main():
     userdata['type'] = type
     userdata['url'] = url
     userdata['usrgrps'] = usergroups
+    userdata['user_medias'] = media
 
     method = user.user_exists(username, userdata)
-    group_ids = user.check_usergroup_exists(usergroups)
+    #group_ids = user.check_usergroup_exists(usergroups)
 
     if method == "exists":
         if state == "absent":
