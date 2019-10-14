@@ -1,0 +1,83 @@
+- hosts: ssfnzas911
+  gather_facts: no
+  tasks:
+    - name: 'webhook type..'
+      local_action:
+        module: zabbix_mediatype
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "webhook type..."
+        type: 4
+        description: "this is a webhook, it hooks webs. RIP Jabber."
+        script: "das webhook-script..."
+        timeout_param: '40s'
+        parameters: [
+          {'name': 'oo', 'value': '1'},
+          {'name': 'bar', 'value': 'baz'},
+          {'name': 'bla', 'value': 'blubb'}
+        ]
+        status: 1
+    - name: Create Media Type (Email)
+      local_action:
+        module: zabbix_mediatype
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "Happy little email media type"
+        type: 0
+        smtp_server: "localhost"
+        smtp_helo: "sysfive.com"
+        smtp_email: "zbx@sysfive.com"
+        status: 0
+        smtp_port: 25
+        description: "this is an email mediatype, it sends emails..."
+    - name: Create Media Type (Script)
+      local_action:
+        module: zabbix_mediatype
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "SCRIPT Media Type!!"
+        type: 1
+        exec_path: "/was/weiss/ich/denn"
+        status: 1
+        exec_params: "{ALERT.SENDTO}\n{ALERT.SUBJECT}\n{ALERT.MESSAGE}\n"
+    # testing delete...
+    - name: 'delete test script 0'
+      local_action:
+        module: zabbix_mediatype
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "test script 0"
+        type: 1
+        state: absent
+    - name: 'SMS type testtest'
+      local_action:
+        module: zabbix_mediatype
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "SMS type testtest"
+        gsm_modem: "idk what that is..."
+        type: 2
+    - name: 'foo'
+      local_action:
+        module: zabbix_mediatype
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "foooooooooo"
+        type: 0
+        state: absent
+    - name: 'another example'
+      local_action:
+        module: zabbix_mediatype
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "never get tired of this..."
+        type: 2
+        gsm_modem: "modem ftw"
+        status: 1
