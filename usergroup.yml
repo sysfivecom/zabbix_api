@@ -1,0 +1,57 @@
+- hosts: ssfnzas911
+  gather_facts: no
+  tasks:
+    - name: Create a usergroup
+      local_action:
+        module: zabbix_usergroup
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "this is a group"
+        gui_access: 2
+        debug_mode: 1
+        users_status: 0
+    - name: "Goodbye test group 123"
+      local_action:
+        module: zabbix_usergroup
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "test group 123"
+        state: absent
+    - name: "does not exists"
+      local_action:
+        module: zabbix_usergroup
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "i am not a group"
+        state: absent
+    - name: "rights..."
+      local_action:
+        module: zabbix_usergroup
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "group with rights"
+        rights:
+          - {'permission': 2, 'id': 1}
+    - name: "more rights..."
+      local_action:
+        module: zabbix_usergroup
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "group with more rights"
+        rights:
+          - {'permission': 2, 'id': 1}
+          - {'permission': 3, 'id': 12}
+    - name: "and tag filters...."
+      local_action:
+        module: zabbix_usergroup
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "group with whatever tag_filters are..."
+        tag_filters:
+          - {'groupid': 2, 'tag': 'idk', 'value': 'wtf'}
