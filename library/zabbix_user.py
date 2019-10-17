@@ -146,6 +146,8 @@ EXAMPLES = '''
         severity: 63
 '''
 
+from ansible.module_utils.basic import AnsibleModule
+
 try:
     from zabbix_api import ZabbixAPI, ZabbixAPISubClass
     from zabbix_api import Already_Exists
@@ -154,7 +156,6 @@ try:
 except ImportError:
     HAS_ZABBIX_API = False
 
-from ansible.module_utils.basic import AnsibleModule
 
 class zbxUser(object):
     def __init__(self, module, zbx):
@@ -165,34 +166,35 @@ class zbxUser(object):
         method = "create"
         exists = self._zapi.user.get({'filter': {'alias': alias}})
         if len(exists) > 0 and 'userid' in exists[0]:
-          method = "update"
-          # lets check for all parameters - except passwd..
-          # XXX: expand this list to all API properties for UserObject
-          userparams = self._zapi.user.get({'filter': {'alias': alias,
-            'autologin': userdata['autologin'],
-            'autologout': userdata['autologout'],
-            'lang': userdata['lang'],
-            'name': userdata['name'],
-            'refresh': userdata['refresh'],
-            'rows_per_page': userdata['rows'],
-            'surname': userdata['surname'],
-            'theme': userdata['theme'],
-            'type': userdata['type'],
-            'url': userdata['url'],
-            'user_medias': userdata['user_medias'],
-          }})
-          # XXX: need to check usergroups!
-          if len(userparams) > 0:
-            method = "exists"
+            method = "update"
+            # lets check for all parameters - except passwd..
+            # XXX: expand this list to all API properties for UserObject
+            userparams = self._zapi.user.get({'filter': {'alias': alias,
+                'autologin': userdata['autologin'],
+                'autologout': userdata['autologout'],
+                'lang': userdata['lang'],
+                'name': userdata['name'],
+                'refresh': userdata['refresh'],
+                'rows_per_page': userdata['rows'],
+                'surname': userdata['surname'],
+                'theme': userdata['theme'],
+                'type': userdata['type'],
+                'url': userdata['url'],
+                'user_medias': userdata['user_medias'],
+            }})
+            # XXX: need to check usergroups!
+            if len(userparams) > 0:
+                method = "exists"
 
         return method
 
     def check_usergroup_exists(self, group_names):
-      #XXX: need to loop over value or lookup_byname
+        # XXX: need to loop over value or lookup_byname
         for group_name in group_names:
-            result = self._zapi.usergroup.get({'filter': {group_name}})
+            result = self._zapi.usergroup.get({'filter': {'name': group_name}})
             if not result:
-                self._module.fail_json(msg="Usergroup not found: '%s'" % group_name)
+                self._module.fail_json(
+                        msg="Usergroup not found: '%s'" % group_name)
         return True
 
     def create_or_update(self, method, alias, data):
@@ -206,36 +208,51 @@ class zbxUser(object):
             parameters['alias'] = alias
             for item in data:
                 if data[item]:
-                   parameters[item] = data[item]
-                   if 'media' in parameters:
-                      medias = []
-                      for media in parameters['media']:
-                         medias.append({'user_medias': media})
-                      parameters['user_medias'] = medias
+                    parameters[item] = data[item]
+                    if 'media' in parameters:
+                        medias = []
+                        for media in parameters['media']:
+                            medias.append({'user_medias': media})
+                        parameters['user_medias'] = medias
+                    if 'usrgrps' in parameters:
+                        groupids = []
+                        for group in parameters['usrgrps']:
+                            group_id = self._zapi.usergroup.get(
+                                    {'filter': {'name': group}})[0]['usrgrpid']
+                            groupids += [{'usrgrpid': group_id}]
 
+            try:
+                # if we have a set of groupids, copy it to parameters
+                # must happen after the for loop to ensure it does not loop over these!)
+                parameters['usrgrps'] = groupids
+            except:
+                # do nothing
+                pass
             if len(parameters) > 1:
                 if method == "update":
-                   result = self._zapi.user.get({
-                     'filter': {'alias': alias} })
-                   parameters['userid'] = result[0]['userid']
-                   self._zapi.user.update(parameters)
-                   self._module.exit_json(
-                       changed=True,
-                       result="Updated user %s" % alias
-                   )
+                    result = self._zapi.user.get({
+                        'filter': {'alias': alias}})
+                    parameters['userid'] = result[0]['userid']
+                    self._zapi.user.update(parameters)
+                    self._module.exit_json(
+                        changed=True,
+                        result="Updated user %s" % alias
+                    )
                 if method == "create":
-                   self._zapi.user.create(parameters)
-                   self._module.exit_json(
-                       changed=True,
-                       result="Created user %s" % alias
-                   )
+                    self._zapi.user.create(parameters)
+                    self._module.exit_json(
+                         changed=True,
+                         result="Created user %s" % alias
+                    )
                 else:
-                   self._module.fail_json(
-                       changed=False,
-                       msg="unknown method '%s' to create_or_update" % method
-                   )
+                    self._module.fail_json(
+                        changed=False,
+                        msg="unknown method '%s' to create_or_update" % method
+                    )
             else:
-                self._module.exit_json(changed=False, msg="No user data/parameters found!")
+                self._module.exit_json(
+                        changed=False,
+                        msg="No user data/parameters found!")
         except Exception as e:
             self._module.fail_json(msg="XX Failed to %s user %s: %s" %
                                        (method, alias, e))
@@ -264,20 +281,22 @@ def main():
             theme=dict(type='str', required=False),
             type=dict(type='int', required=False),
             url=dict(type='str', required=False),
-            usergroups=dict(type='list', default=[7]),
+            usergroups=dict(type='list', default=["Guests"]),
             media=dict(type='list', required=False),
         ),
         supports_check_mode=False
     )
 
     if not HAS_ZABBIX_API:
-        module.fail_json(msg="!! Missing required zabbix-api module (check docs or install with: pip install zabbix-api)")
+        module.fail_json(
+                msg="!! Missing required zabbix-api module \
+                        (check docs or install with: pip install zabbix-api)")
 
     server_url = module.params['server_url']
-    #api login
+    # api login
     login_user = module.params['login_user']
     login_password = module.params['login_password']
-    #basic auth login?
+    # basic auth login
     http_login_user = module.params['http_login_user']
     http_login_password = module.params['http_login_password']
     validate_certs = module.params['validate_certs']
@@ -302,11 +321,16 @@ def main():
 
     # login to zabbix
     try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
+        zbx = ZabbixAPI(server_url,
+                timeout=timeout,
+                user=http_login_user,
+                passwd=http_login_password,
+                validate_certs=validate_certs)
         zbx.login(login_user, login_password)
     except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: {server} with {exception}".format(server=server_url, exception=e))
+        module.fail_json(
+                msg="Failed to connect to Zabbix server: {server} with {exception}".format(
+                    server=server_url, exception=e))
 
     user = zbxUser(module, zbx)
 
@@ -328,17 +352,23 @@ def main():
     userdata['user_medias'] = media
 
     method = user.user_exists(username, userdata)
-    #group_ids = user.check_usergroup_exists(usergroups)
+    group_ids = user.check_usergroup_exists(usergroups)
 
     if method == "exists":
         if state == "absent":
             user.delete(alias)
         else:
-            module.exit_json(changed=False, result="User %s exists as specified" % username)
+            module.exit_json(
+                    changed=False,
+                    result="User %s exists as specified" % username)
     else:
         user.create_or_update(method, username, userdata)
 
     # fallthru error
-    module.fail_json(changed=True, result="This module should not exit this way!")
+    module.fail_json(
+            changed=True,
+            result="This module should not exit this way!")
+
+
 if __name__ == '__main__':
     main()

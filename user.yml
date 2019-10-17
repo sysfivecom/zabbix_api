@@ -12,13 +12,25 @@
         surname: "Doe"
         passwd: "supersecret"
         usergroups:
-          - usrgrpid: "7"
-          - usrgrpid: "8"
+          - "Guests"
+          - "Zabbix administrators"
         media:
-          - mediatypeid: "1"
+          - mediatypeid: "35"
             sendto: "foo@example.com"
             severity: 24
             period: "1-7,00:00-24:00"
-          - mediatypeid: "1"
+          - mediatypeid: "35"
             sendto: "alal@example.com"
             severity: 63
+    - name: Get users via module
+      local_action:
+        module: zabbix_user
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        username: janedoe
+        name: "Jane"
+        surname: "Doe"
+        passwd: "supersecret"
+        usergroups:
+          - "Zabbix administrators"
