@@ -57,9 +57,9 @@ EXAMPLES = '''
     debug_mode: 0
     users_status: 0
     rights:
-        - {'permission': 2, 'id': 1}
+        - {'permission': '2', 'id': '1'}
     tag_filters:
-        - {'groupid': 2, 'tag': 'idk', 'value': 'wtf'}
+        - {'groupid': '2', 'tag': 'idk', 'value': 'wtf'}
 - name: Delete usergroup
   local_action:
     module: zabbix_usergroup
@@ -99,17 +99,32 @@ class zbxUserGroup(object):
                         'name': data['name'],
                         'gui_access': data['gui_access'],
                         'users_status': data['users_status'],
-                        'debug_mode': data['debug_mode'],
-                        #I'm not sure if filter works for lists...
-                        'rights': data['rights'],
-                        'tag_filters': data['tag_filters']
+                        'debug_mode': data['debug_mode']
                     }
                 }
             )
+            #oh well...
+            #I ruined it to death
             if len(usergroupparams) > 0:
-                method = "exists"
-        #        self._module.exit_json(changed=False, result="exists: {}".format(exists))
-        #self._module.exit_json(changed=False, result="{}\n{}".format(data, exists))
+                sorted_usergroupparam_rights = 0
+                sorted_data_rights = 0
+                sorted_data_tag_filters = 0
+                sorted_usergroupparam_tag_filters = 0
+                if data['rights']:
+                    #compare rights
+                    sorted_usergroupparam_rights = sorted(usergroupparams[0]['rights'], key=lambda k: k['id'])
+                    sorted_data_rights = sorted(data['rights'], key=lambda k: k['id'])
+
+                if data['tag_filters']:
+                    #compare tag_filters
+                    sorted_usergroupparam_tag_filters = sorted(sorted(sorted(usergroupparams[0]['tag_filters'], key=lambda k: k['value']), key=lambda k: k['tag']), key=lambda k: k['groupid'])
+                    sorted_data_tag_filters = sorted(sorted(sorted(data['tag_filters'], key=lambda k: k['value']), key=lambda k: k['tag']), key=lambda k: k['groupid'])
+                if not data['rights'] and not data['tag_filters']:
+                    method = "exists"
+                elif sorted_usergroupparam_tag_filters == sorted_data_tag_filters and sorted_usergroupparam_rights == sorted_data_rights:
+                    method = "exists"
+                else:
+                    method = "update"
         return method
 
     def create_or_update(self, method, data):

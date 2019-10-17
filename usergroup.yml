@@ -1,6 +1,44 @@
 - hosts: ssfnzas911
   gather_facts: no
   tasks:
+    - name: you get the worst of both worlds
+      local_action:
+        module: zabbix_usergroup
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "tag filters AND rights"
+        tag_filters:
+          - {'groupid': '6', 'tag': 'q', 'value': '3' }
+          - {'groupid': '4', 'tag': 'c', 'value': '4' }
+          - {'groupid': '7', 'tag': 'd', 'value': 'foo' }
+          - {'groupid': '2', 'tag': 'g', 'value': '0' }
+          - {'groupid': '4', 'tag': 'z', 'value': 'zu' }
+          - {'groupid': '9', 'tag': 'e', 'value': 'qe' }
+          - {'groupid': '5', 'tag': 'x', 'value': 'io' }
+          - {'groupid': '5', 'tag': 'b', 'value': 'ag' }
+        rights:
+          - {'id': '1', 'permission': '2'}
+          - {'id': '12', 'permission': '3'}
+          - {'id': '8', 'permission': '3'}
+          - {'id': '4', 'permission': '2'}
+          - {'id': '11', 'permission': '3'}
+    - name: tag filters....
+      local_action:
+        module: zabbix_usergroup
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "lots of tag filters..."
+        tag_filters:
+          - {'groupid': '6', 'tag': 'q', 'value': '3' }
+          - {'groupid': '4', 'tag': 'c', 'value': '4' }
+          - {'groupid': '7', 'tag': 'd', 'value': 'foo' }
+          - {'groupid': '2', 'tag': 'g', 'value': '0' }
+          - {'groupid': '4', 'tag': 'z', 'value': 'zu' }
+          - {'groupid': '9', 'tag': 'e', 'value': 'qe' }
+          - {'groupid': '5', 'tag': 'x', 'value': 'io' }
+          - {'groupid': '5', 'tag': 'a', 'value': 'ag' }
     - name: Create a usergroup
       local_action:
         module: zabbix_usergroup
@@ -35,7 +73,7 @@
         login_password: "{{ zabbix_apipw }}"
         name: "group with rights"
         rights:
-          - {'permission': 2, 'id': 1}
+          - {'id': '1', 'permission': '2'}
     - name: "more rights..."
       local_action:
         module: zabbix_usergroup
@@ -44,8 +82,10 @@
         login_password: "{{ zabbix_apipw }}"
         name: "group with more rights"
         rights:
-          - {'permission': 2, 'id': 1}
-          - {'permission': 3, 'id': 12}
+          - {'id': '1', 'permission': '2'}
+          - {'id': '12', 'permission': '3'}
+          - {'id': '8', 'permission': '3'}
+          - {'id': '4', 'permission': '3'}
     - name: "and tag filters...."
       local_action:
         module: zabbix_usergroup
@@ -53,5 +93,8 @@
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
         name: "group with whatever tag_filters are..."
+        users_status: 1
         tag_filters:
-          - {'groupid': 2, 'tag': 'idk', 'value': 'wtf'}
+          - {'groupid': '2', 'tag': 'idk', 'value': 'wtf'}
+          - {'groupid': '2', 'tag': 'foo', 'value': 'bar'}
+          - {'groupid': '4', 'tag': 'kill', 'value': 'me'}
