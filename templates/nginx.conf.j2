@@ -1,0 +1,64 @@
+user              nginx;
+worker_processes  1;
+
+{% if 'headers' in ansible_run_tags  %}
+error_log  /var/log/nginx/error.log debug;
+{% else %}
+error_log  /var/log/nginx/error.log;
+{% endif %}
+pid        /var/run/nginx.pid;
+
+events {
+{% if 'headers' in ansible_run_tags  %}
+    debug_connection 10.211.55.0/24;
+{% endif %}
+    worker_connections  1024;
+}
+
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+    log_format postdata $request_body;
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    keepalive_timeout  65;
+    include /etc/nginx/conf.d/*.conf;
+
+    server {
+        listen       9595;
+        location = /ok.txt { access_log off; return 200;}
+        location / {
+            root   /usr/share/zabbix;
+            index  index.php;
+            location = /api_jsonrpc.php {
+{% if 'postdata' in ansible_run_tags  %}
+                access_log /var/log/nginx/rpc-postdata.log postdata;
+{% endif %}
+                fastcgi_hide_header X-Powered-By;
+                fastcgi_pass unix:/run/php-fpm/fpm.sock;
+                fastcgi_index index.php;
+                fastcgi_read_timeout 7200;
+                fastcgi_send_timeout 7200;
+                include /etc/nginx/fastcgi.conf;
+            }
+            location ~ .php {
+                fastcgi_hide_header X-Powered-By;
+                fastcgi_pass unix:/run/php-fpm/fpm.sock;
+                fastcgi_index index.php;
+                fastcgi_read_timeout 7200;
+                fastcgi_send_timeout 7200;
+                include /etc/nginx/fastcgi.conf;
+            }
+        }
+        error_page  404              /404.html;
+        location = /404.html {
+            root   /usr/share/nginx/html;
+        }
+    }
+}
