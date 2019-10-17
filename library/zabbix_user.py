@@ -257,6 +257,26 @@ class zbxUser(object):
             self._module.fail_json(msg="XX Failed to %s user %s: %s" %
                                        (method, alias, e))
 
+    def delete(self, name):
+        method = "delete"
+        try:
+            if self._module.check_mode:
+                self._module.exit_json(changed=True)
+
+            result = self._zapi.user.get({
+                'filter': {'alias': name}
+            })
+            if len(result) > 0 and 'userid' in result[0]:
+                self._zapi.user.delete([result[0]['userid']])
+                self._module.exit_json(
+                    changed=True,
+                    result="Deleted user {}".format(name)
+                )
+            else:
+                self._module.exit_json(changed=False, result="User {} not found so no need to delete it...".format(name))
+        except Exception as e:
+            self._module.fail_json(msg="Failed to {} user {}: {}".format(method, name, e))
+
 
 def main():
     module = AnsibleModule(
@@ -354,16 +374,12 @@ def main():
     method = user.user_exists(username, userdata)
     group_ids = user.check_usergroup_exists(usergroups)
 
-    if method == "exists":
-        if state == "absent":
-            user.delete(alias)
-        else:
-            module.exit_json(
-                    changed=False,
-                    result="User %s exists as specified" % username)
+    if state == "absent":
+        user.delete(username)
+    elif method == "exists":
+        module.exit_json(changed=False, result="User %s exists as specified" % username)
     else:
         user.create_or_update(method, username, userdata)
-
     # fallthru error
     module.fail_json(
             changed=True,

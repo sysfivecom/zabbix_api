@@ -1,7 +1,7 @@
 - hosts: ssfnzas911
   gather_facts: no
   tasks:
-    - name: Get users via module
+    - name: Set users via module
       local_action:
         module: zabbix_user
         server_url: "{{ zabbix_apiurl }}"
@@ -22,7 +22,7 @@
           - mediatypeid: "35"
             sendto: "alal@example.com"
             severity: 63
-    - name: Get users via module
+    - name: Set users via module
       local_action:
         module: zabbix_user
         server_url: "{{ zabbix_apiurl }}"
@@ -34,3 +34,25 @@
         passwd: "supersecret"
         usergroups:
           - "Zabbix administrators"
+    - name: Delete users via module
+      local_action:
+        module: zabbix_user
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        username: janedoe
+        name: "Jane"
+        surname: "Doe"
+        passwd: "supersecret"
+        state: absent
+    - name: Delete users via module
+      local_action:
+        module: zabbix_user
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        username: janedoe
+        name: "Jane"
+        surname: "Doe"
+        passwd: "supersecret"
+        state: absent
