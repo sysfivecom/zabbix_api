@@ -12,16 +12,21 @@
         surname: "Doe"
         passwd: "supersecret"
         usergroups:
-          - "Guests"
+#          - "Guests"
           - "Zabbix administrators"
         media:
           - mediatypeid: "35"
-            sendto: "foo@example.com"
-            severity: 24
+            sendto:
+              - "alal@example.com"
+            active: 1
+            severity: 62
             period: "1-7,00:00-24:00"
           - mediatypeid: "35"
-            sendto: "alal@example.com"
-            severity: 63
+            sendto:
+              - "foo@example.com"
+            active: 0
+            severity: 24
+            period: "1-7,00:00-24:00"
     - name: Set users via module
       local_action:
         module: zabbix_user

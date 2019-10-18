@@ -28,7 +28,7 @@ Item prototype 3
 LLD rule 3
 Maintenance 0
 Map 0
-Media type 2
+Media type 1
 Problem 3
 Proxy 0
 Screen 0
@@ -42,8 +42,8 @@ Template screen item 4
 Trend 3
 Trigger 2
 Trigger prototype 3
-User 0.2
-User group 2
+User 1
+User group 1
 User macro 3
 Value map 4
 Web scenario 2
