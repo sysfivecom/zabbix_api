@@ -148,12 +148,18 @@ class zbxMediaType(object):
                 'show_event_menu': mediatypedata['show_event_menu'],
                 'event_menu_url': mediatypedata['event_menu_url'],
                 'event_menu_name': mediatypedata['event_menu_name'],
-                #can't update parameters, I tried...
                 'parameters': mediatypedata['parameters']
             }})
             if len(mediatypeparams) > 0:
-                method = "exists"
-        #self._module.exit_json(changed=False, msg="mediatypeparams: %s, method %s" % (mediatypeparams, method))
+                sorted_data_parameters = 0
+                sorted_mediatypeparams_parameters = 0
+                if mediatypedata['parameters']:
+                    sorted_mediatypedata_parameters = sorted(mediatypedata['parameters'], key=lambda k: k['name'])
+                    sorted_mediatypeparams_parameters = sorted(mediatypeparams[0]['parameters'], key=lambda k: k['name'])
+                    if sorted_mediatypedata_parameters == sorted_mediatypeparams_parameters:
+                        method = "exists"
+                else:
+                    method = "exists"
         return method
 
     def create_or_update(self, method, name, data):
@@ -161,8 +167,6 @@ class zbxMediaType(object):
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
 
-            #sorry, this is required...
-            #need to sort out None values to avoid weird API errors when creating media types...
             data = dict(filter(lambda elem: elem[1] != None,data.items()))
             if len(data) > 1:
                 if method == "create":

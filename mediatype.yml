@@ -12,11 +12,11 @@
         description: "this is a webhook, it hooks webs. RIP Jabber."
         script: "das webhook-script..."
         timeout_param: '40s'
-        parameters: [
-          {'name': 'oo', 'value': '1'},
-          {'name': 'bar', 'value': 'baz'},
-          {'name': 'bla', 'value': 'blubb'}
-        ]
+        parameters:
+          - {'name': 'oo', 'value': '1'}
+          #- {'name': 'bar', 'value': 'baz'}
+          - {'name': 'bla', 'value': 'blubb'}
+          - {'name': 'cat', 'value': 'meow'}
         status: 1
     - name: Create Media Type (Email)
       local_action:
