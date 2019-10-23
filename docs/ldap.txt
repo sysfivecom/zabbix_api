@@ -1,0 +1,13 @@
+ssh -L1389:ssfndnc121:389 ssfn1
+vagrant ssh ssfnzas911 -- -R 1389:127.0.0.1:1389
+
+in zabbix: Administration > Authentication: LDAP Settings
+Enable LDAP authentication: yep
+LDAP host: 127.0.0.1
+Port: 1389
+Base DN: dc=rootnexus,dc=net
+Search attribute: uid
+
+
+Administration > Authentication: Authentication
+you can set this to LDAP, but make sure that Admin can login with a normal pw

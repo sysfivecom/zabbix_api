@@ -1,6 +1,17 @@
 - hosts: ssfnzas911
   gather_facts: no
   tasks:
+    - name: create non ldap user group
+      local_action:
+        module: zabbix_usergroup
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "Admin has no LDAP"
+        gui_access: 1
+        # 0 is system default (so set system default to LDAP) access
+        # 1 is internal access
+        # 2 is disabled
     - name: you get the worst of both worlds
       local_action:
         module: zabbix_usergroup
