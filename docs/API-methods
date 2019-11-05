@@ -1,49 +1,48 @@
 # API methods to be (or not) implemented, per zabbix docs
-# value: 0=ansible, 1=done, 2=need_now, 3=need_later, 4=no_need
-Action 0
-Alert 2
-API info 4
-Application 3
-Auto registration 3
-Configuration 3
-Correlation 3
-Dashboard 3
-Discovered host 4
-Discovered service 3
-Discovery check 4
-Discovery rule 4
-Event 3
-Graph 3
-Graph item 3
-Graph prototype 3
-History 4
-Host 0
-Host group 0
-Host interface 2
-Host prototype 3
-Icon map 4
-Image 4
-Item 2
-Item prototype 3
-LLD rule 3
-Maintenance 0
-Map 0
-Media type 1
-Problem 3
-Proxy 0
-Screen 0
-Screen item 4
-Script 2
-Service 3
-Task 2
-Template 0
-Template screen 4
-Template screen item 4
-Trend 3
-Trigger 2
-Trigger prototype 3
-User 1
-User group 1
-User macro 3
-Value map 4
-Web scenario 2
+Action 			ansible
+Alert 			need now
+API info 		no need
+Application 		need later
+Auto registration 	need later
+Configuration 		need later
+Correlation 		need later
+Dashboard 		done
+Discovered host 	no need
+Discovered service 	need later
+Discovery check 	no need
+Discovery rule 		no need
+Event 			need later
+Graph 			need later
+Graph item 		need later
+Graph prototype 	need later
+History 		no need
+Host 			ansible
+Host group 		ansible
+Host interface 		need now
+Host prototype 		need later
+Icon map 		no need
+Image 			no need
+Item 			need now
+Item prototype 		need later
+LLD rule 		need later
+Maintenance 		ansible
+Map 			ansible
+Media type 		done
+Problem 		need later
+Proxy 			ansible
+Screen 			ansible
+Screen item 		no need
+Script 			need now
+Service 		need later
+Task 			need now
+Template 		ansible
+Template screen 	no need
+Template screen item 	no need
+Trend 			need later
+Trigger 		need now
+Trigger prototype 	need later
+User 			done
+User group 		done
+User macro 		need later
+Value map 		no need
+Web scenario 		need now
