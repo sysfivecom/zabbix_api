@@ -11,4 +11,4 @@ ansible_python_interpreter=/usr/bin/env python3
 # Settings for Zabbix API Access
 zabbix_apiurl="http://10.211.55.101:9595"
 zabbix_apiuser=Admin
-zabbix_apipw=zabbix
+zabbix_apipw=zabbixpw

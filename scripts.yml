@@ -10,15 +10,15 @@
         name: "Hello World!"
         command: "echo \"Hello World!\""
         description: "not such a good example for hello world, you probably won't even see the output anywhere (changed description)"
-        confirmation: "please confirm, that you want to say hello to this terrible world"
+        confirmation: "please confirm, that you want to say hello"
     - name: IPMI script
       local_action:
         module: zabbix_scripts
         server_url: "{{ zabbix_apiurl }}"
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
-        name: "what is an IPMI script?"
-        command: "ipmi something..."
+        name: "IPMI Script"
+        command: "ipmi foobar"
         type: 1
     - name: delete it
       local_action:
@@ -27,5 +27,5 @@
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
         name: "delete me"
-        command: "totally doesn't matter, but is required -.-"
+        command: "ipmi foobar"
         state: "absent"

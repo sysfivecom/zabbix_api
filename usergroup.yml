@@ -9,9 +9,11 @@
         login_password: "{{ zabbix_apipw }}"
         name: "Admin has no LDAP"
         gui_access: 1
-        # 0 is system default (so set system default to LDAP) access
-        # 1 is internal access
-        # 2 is disabled
+        # Possible values:
+        # 0 - (default) use the system default authentication method;
+        # 1 - use internal authentication;
+        # 2 - use LDAP authentication;
+        # 3 - disable access to the frontend.
     - name: you get the worst of both worlds
       local_action:
         module: zabbix_usergroup
@@ -68,7 +70,7 @@
         login_password: "{{ zabbix_apipw }}"
         name: "test group 123"
         state: absent
-    - name: "does not exists"
+    - name: "does not exist"
       local_action:
         module: zabbix_usergroup
         server_url: "{{ zabbix_apiurl }}"
@@ -106,6 +108,6 @@
         name: "group with whatever tag_filters are..."
         users_status: 1
         tag_filters:
-          - {'groupid': '2', 'tag': 'idk', 'value': 'wtf'}
-          - {'groupid': '2', 'tag': 'foo', 'value': 'bar'}
-          - {'groupid': '4', 'tag': 'kill', 'value': 'me'}
+          - {'groupid': '2', 'tag': 'foo1', 'value': 'bar1'}
+          - {'groupid': '2', 'tag': 'foo2', 'value': 'bar2'}
+          - {'groupid': '4', 'tag': 'foo3', 'value': 'bar3'}

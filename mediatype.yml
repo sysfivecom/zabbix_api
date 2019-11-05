@@ -1,22 +1,21 @@
 - hosts: ssfnzas911
   gather_facts: no
   tasks:
-    - name: 'webhook type..'
+    - name: 'webhook type'
       local_action:
         module: zabbix_mediatype
         server_url: "{{ zabbix_apiurl }}"
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
-        name: "webhook type..."
+        name: "webhook type"
         type: 4
-        description: "this is a webhook, it hooks webs. RIP Jabber."
-        script: "das webhook-script..."
+        description: "this is a webhook"
+        script: "/* some java script to implement it*/"
         timeout_param: '40s'
         parameters:
-          - {'name': 'oo', 'value': '1'}
-          #- {'name': 'bar', 'value': 'baz'}
-          - {'name': 'bla', 'value': 'blubb'}
-          - {'name': 'cat', 'value': 'meow'}
+          - {'name': 'foo1', 'value': 'bar1'}
+          - {'name': 'foo2', 'value': 'bar2'}
+          - {'name': 'foo3', 'value': 'bar3'}
         status: 1
     - name: Create Media Type (Email)
       local_action:
@@ -24,23 +23,23 @@
         server_url: "{{ zabbix_apiurl }}"
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
-        name: "Happy little email media type"
+        name: "E-Mail"
         type: 0
         smtp_server: "localhost"
         smtp_helo: "sysfive.com"
         smtp_email: "zbx@sysfive.com"
         status: 0
         smtp_port: 25
-        description: "this is an email mediatype, it sends emails..."
+        description: "this is an email mediatype"
     - name: Create Media Type (Script)
       local_action:
         module: zabbix_mediatype
         server_url: "{{ zabbix_apiurl }}"
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
-        name: "SCRIPT Media Type!!"
+        name: "Script"
         type: 1
-        exec_path: "/was/weiss/ich/denn"
+        exec_path: "/var/lib/zabbix/alertscripts/foobar.sh"
         status: 1
         exec_params: "{ALERT.SENDTO}\n{ALERT.SUBJECT}\n{ALERT.MESSAGE}\n"
     # testing delete...
@@ -53,14 +52,14 @@
         name: "test script 0"
         type: 1
         state: absent
-    - name: 'SMS type testtest'
+    - name: 'SMS type'
       local_action:
         module: zabbix_mediatype
         server_url: "{{ zabbix_apiurl }}"
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
-        name: "SMS type testtest"
-        gsm_modem: "idk what that is..."
+        name: "SMS type"
+        gsm_modem: "/dev/null"
         type: 2
     - name: 'foo'
       local_action:
@@ -68,7 +67,7 @@
         server_url: "{{ zabbix_apiurl }}"
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
-        name: "foooooooooo"
+        name: "foo"
         type: 0
         state: absent
     - name: 'another example'
@@ -77,7 +76,7 @@
         server_url: "{{ zabbix_apiurl }}"
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
-        name: "never get tired of this..."
+        name: "more SMS"
         type: 2
-        gsm_modem: "modem ftw"
+        gsm_modem: "/dev/null"
         status: 1

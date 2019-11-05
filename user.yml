@@ -1,20 +1,20 @@
 - hosts: ssfnzas911
   gather_facts: no
   tasks:
-    - name: me
+    - name: LDAP testuser
       local_action:
         module: zabbix_user
         server_url: "{{ zabbix_apiurl }}"
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
-        username: ariebe
-        name: "Riebe"
-        surname: "Alina"
+        username: ldapuser
+        name: "User"
+        surname: "LDAP"
         #I can login with this if I set default authentication to Internal
-        passwd: "ali doesn't need a password"
+        passwd: "doesnotneedpassword"
         usergroups:
           - "Zabbix administrators"
-    - name: Admin...
+    - name: Admin
       local_action:
         module: zabbix_user
         server_url: "{{ zabbix_apiurl }}"
@@ -23,7 +23,7 @@
         username: Admin
         name: Zabbix
         surname: Administrator
-        passwd: zabbix
+        passwd: zabbixpw
         usergroups:
           - "Zabbix administrators"
           - "Admin has no LDAP"

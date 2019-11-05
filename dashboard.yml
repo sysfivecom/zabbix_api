@@ -10,9 +10,9 @@
         name: "Test Dashboard"
         private: 0
         users:
-          - {'userid': '5', 'permission': '2'}
+          - {'userid': '100', 'permission': '2'}
         userGroups:
-          - {'permission': '3', 'usrgrpid': '22'}
+          - {'permission': '3', 'usrgrpid': '13'}
     - name: create another dashboard
       local_action:
         module: zabbix_dashboard
@@ -20,7 +20,7 @@
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
         name: "I am board"
-        userid: "5"
+        userid: "100"
     - name: create another dashboard
       local_action:
         module: zabbix_dashboard
@@ -28,45 +28,44 @@
         login_user: "{{ zabbix_apiuser }}"
         login_password: "{{ zabbix_apipw }}"
         name: "rainbowdashboard"
-        #making widgets sucks -.-"
         widgets:
           - {'type': 'problems', 'name': 'idk', 'x': '0', 'y': '0', 'width': '12', 'height': '5', 'view_mode': '0', 'fields': []}
           - {'type': 'map', 'name': 'help me', 'x': '13', 'y': '6', 'width': '5', 'height': '5', 'view_mode': '0', 'fields': []}
 
-#just play around with create, dump, delete, import^^
-#    - name: create foobar
-#      local_action:
-#        module: zabbix_dashboard
-#        server_url: "{{ zabbix_apiurl }}"
-#        login_user: "{{ zabbix_apiuser }}"
-#        login_password: "{{ zabbix_apipw }}"
-#        name: "foobar"
-#        users:
-#          - {'userid': '5', 'permission': '2'}
-#        userGroups:
-#          - {'permission': '3', 'usrgrpid': '22'}
-#        widgets:
-#          - {'type': 'actionlog', 'name': 'actions to the log', 'x': '0', 'y': '0', 'width': '7', 'height': '3', 'view_mode': '0', 'fields': []}
-#          - {'type': 'clock', 'name': 'what time is it?', 'x': '15', 'y': '0', 'width': '4', 'height': '3', 'view_mode': '0', 'fields': []}
-#          - {'type': 'favgraphs', 'name': 'BEST.GRAPH.EVER.', 'x': '0', 'y': '3', 'width': '15', 'height': '4', 'view_mode': '0', 'fields': []}
+# just play around with create, dump, delete, import
+    - name: create foobar
+      local_action:
+        module: zabbix_dashboard
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "foobar"
+        users:
+          - {'userid': '100', 'permission': '2'}
+        userGroups:
+          - {'permission': '3', 'usrgrpid': '13'}
+        widgets:
+          - {'type': 'actionlog', 'name': 'actions to the log', 'x': '0', 'y': '0', 'width': '7', 'height': '3', 'view_mode': '0', 'fields': []}
+          - {'type': 'clock', 'name': 'what time is it?', 'x': '15', 'y': '0', 'width': '4', 'height': '3', 'view_mode': '0', 'fields': []}
+          - {'type': 'favgraphs', 'name': 'BEST.GRAPH.EVER.', 'x': '0', 'y': '3', 'width': '15', 'height': '4', 'view_mode': '0', 'fields': []}
 
-#    - name: dump foobar
-#      local_action:
-#        module: zabbix_dashboard
-#        server_url: "{{ zabbix_apiurl }}"
-#        login_user: "{{ zabbix_apiuser }}"
-#        login_password: "{{ zabbix_apipw }}"
-#        name: "foobar"
-#        state: dump
-#        dump_name: "dump_of_foobar"
-#    - name: delete foobar
-#      local_action:
-#        module: zabbix_dashboard
-#        server_url: "{{ zabbix_apiurl }}"
-#        login_user: "{{ zabbix_apiuser }}"
-#        login_password: "{{ zabbix_apipw }}"
-#        name: "foobar"
-#        state: "absent"
+    - name: dump foobar
+      local_action:
+        module: zabbix_dashboard
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "foobar"
+        state: dump
+        dump_name: "dump_of_foobar"
+    - name: delete foobar
+      local_action:
+        module: zabbix_dashboard
+        server_url: "{{ zabbix_apiurl }}"
+        login_user: "{{ zabbix_apiuser }}"
+        login_password: "{{ zabbix_apipw }}"
+        name: "foobar"
+        state: "absent"
     - name: import me
       local_action:
         module: zabbix_dashboard
@@ -76,13 +75,3 @@
         name: "foobar"
         state: import
         dump_name: "dump_of_foobar"
-
-
-# I totally forgot why I copied this :D
-#    - name: Save dashboards to files
-#      local_action:
-#        module: copy
-#        dest: "{{ playbook_dir}}/files/zabbix_dashboards/{{ item.item|replace(' ', '_') }}.json"
-#        content: "{{ item.dashboard_json|to_nice_json(indent=4) }}"
-#      loop: "{{ dashboard_dump.results }}"
-#      tags: ['never', 'download_zabbix_dashboards']
