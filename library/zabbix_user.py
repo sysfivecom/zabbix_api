@@ -180,6 +180,8 @@ class zbxUser(object):
         return sorted_current == sorted_requested
 
     def compareUserMedias(self, requested, current):
+        if len(requested) != len(current):
+           return False
         sorted_current = sorted(current, key=lambda k: k['sendto'])
         sorted_requested = sorted(requested, key=lambda k: k['sendto'])
         result = True
@@ -217,7 +219,7 @@ class zbxUser(object):
                     if 'user_medias' in userdata:
                         if self.compareUserMedias(userdata['user_medias'], userparams[0]['medias']):
                             method = "exists"
-                        #self._module.exit_json(changed=False, result="%s  \n%s \n%s" % (mediaCheck, userdata['user_medias'], userparams[0]['user_medias']))
+                        #self._module.exit_json(changed=False, result="%s \n%s  %s" % (userdata['user_medias'], userparams[0]['medias'], method))
                     else:
                         method = "update"
                 else:
