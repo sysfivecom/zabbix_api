@@ -41,13 +41,13 @@
 #          - "Guests"
           - "Zabbix administrators"
         media:
-          - mediatypeid: "35"
+          - mediatype: "E-Mail"
             sendto:
               - "alal@example.com"
             active: 1
             severity: 62
             period: "1-7,00:00-24:00"
-          - mediatypeid: "35"
+          - mediatype: "E-Mail"
             sendto:
               - "foo@example.com"
             active: 0

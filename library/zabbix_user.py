@@ -136,12 +136,12 @@ EXAMPLES = '''
     state: present
     username: johndoe
     media:
-      - mediatypeid: "1"
+      - mediatype: "E-Mail"
         sendto:
           - "foo@example.com"
         severity: 24
         period: "1-7,00:00-24:00"
-      - mediatypeid: "1"
+      - mediatypeid: "E-Mail"
         sendto:
           -"all@example.com"
         severity: 63
@@ -173,6 +173,16 @@ class zbxUser(object):
             except Exception as e:
                 self._module.fail_json(msg="Failed to find usergroup {} on server.".format(groupname))
         return groups
+
+    def get_mediatypes(self, mediatypes):
+        for mediatype in mediatypes:
+            try:
+                mediatypeid = self._zapi.mediatype.get({'filter': {'name': mediatype['mediatype']}})[0]['mediatypeid']
+                mediatype['mediatypeid'] = mediatypeid
+                mediatype.pop('mediatype')
+            except Exception as e:
+                self._module.fail_json(msg="Failed to find media type {} on server.".format(mediatype))
+        return mediatypes
 
     def compareListParams(self, param, sortkey, requested, current):
         sorted_current = sorted(current[param], key=lambda k: k[sortkey])
@@ -220,8 +230,10 @@ class zbxUser(object):
                         if self.compareUserMedias(userdata['user_medias'], userparams[0]['medias']):
                             method = "exists"
                         #self._module.exit_json(changed=False, result="%s \n%s  %s" % (userdata['user_medias'], userparams[0]['medias'], method))
+                        else:
+                            method = "update"
                     else:
-                        method = "update"
+                            method = "exists"
                 else:
                     method = "update"
         return method
@@ -348,8 +360,11 @@ def main():
     if module.params['type']       is not None: userdata['type']          = module.params['type']
     if module.params['url']        is not None: userdata['url']           = module.params['url']
     if module.params['media']      is not None: userdata['user_medias']   = module.params['media']
-    # we most convert user group names to IDs
+    # we must convert user group and media type names to IDs
     userdata['usrgrps'] = user.get_usergroups(module.params['usergroups'])
+    if module.params['media'] is not None:
+        userdata['user_medias']        = user.get_mediatypes(module.params['media'])
+
 
     method = user.user_exists(userdata)
 
