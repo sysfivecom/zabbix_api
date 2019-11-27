@@ -181,7 +181,7 @@ class zbxUser(object):
                 mediatype['mediatypeid'] = mediatypeid
                 mediatype.pop('mediatype')
             except Exception as e:
-                self._module.fail_json(msg="Failed to find media type {} on server.".format(mediatype))
+                self._module.fail_json(msg="Failed to find media type {} on server.".format(mediatype['mediatype']))
         return mediatypes
 
     def compareListParams(self, param, sortkey, requested, current):

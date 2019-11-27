@@ -37,8 +37,8 @@
         name: "John"
         surname: "Doe"
         passwd: "supersecret"
+        type: 3
         usergroups:
-#          - "Guests"
           - "Zabbix administrators"
         media:
           - mediatype: "E-Mail"

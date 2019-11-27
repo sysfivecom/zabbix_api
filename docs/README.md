@@ -7,17 +7,6 @@ a playground as follows.
 This relies on python library zabbix-api, install by:
 ```pip3 install zabbix-api```.
 
-## Vagrant (small)
-A quick option is to create a VM with the cookbook in
-ssfn1_v_zabbixserver. See README.md there on how to this
-(esp. setup_zabbix_db.sh).
-If unchanged, the existing inventory will "just work".
-
-## Vagrant (large)
-If it's needed to test in a "full cluster", please
-```vagrant up``` in git:tools/manage-zabbix-cluster
-Adapt a new inventory as needed.
-
 ## Test the kit
 ```ansible-playbook -i vagrant_inventory testkit.yml```
 
